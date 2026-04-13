@@ -1,1 +1,4 @@
 .idea
+notes.db
+tests/__pycache__/
+note_manager/__pycache__/
