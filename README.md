@@ -59,7 +59,7 @@ cd NoteManager
 Start the CLI application:
 
 ```bash
-python note_manager/notes_cli.py
+python -m note_manager.notes_cli
 
 notes add "Meeting" "Discuss Q3 budget"
 notes list
