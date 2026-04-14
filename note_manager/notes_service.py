@@ -60,3 +60,6 @@ class NoteService:
         self.conn.commit()
 
         return cursor.rowcount
+
+    def close(self):
+        self.conn.close()

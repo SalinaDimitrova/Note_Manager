@@ -17,6 +17,9 @@ def parse_command(command: str) -> tuple[Optional[str], Optional[list[str]]]:
         print("Missing command (e.g. 'notes list')")
         return None, None
 
+    if parts[1] in ["--help"]:
+        return "help", []
+
     return parts[1], parts[2:]
 
 def handle_help(*_: Any) -> None:
@@ -33,7 +36,9 @@ def handle_add(service: NoteService, args: list[str]) -> None:
         return
 
     title = args[0]
+    # joins the content arguments and supports multiline content
     content = " ".join(args[1:])
+    content = content.encode().decode("unicode_escape")
 
     try:
         note_id = service.add_note(title, content)
@@ -101,35 +106,38 @@ def main() -> None:
         "delete": handle_delete,
     }
 
-    while True:
-        try:
-            print("Enter a command:")
-            command = input().strip()
+    try:
+        while True:
+            try:
+                print("Enter a command:")
+                command = input().strip()
 
-            if not command:
-                continue
+                if not command:
+                    continue
 
-            cmd, args = parse_command(command)
+                cmd, args = parse_command(command)
 
-            if not cmd:
-                print("--- \n")
-                continue
+                if not cmd:
+                    print("--- \n")
+                    continue
 
-            if cmd in ["exit", "quit"]:
-                print("Goodbye!")
-                break
+                if cmd in ["exit", "quit"]:
+                    print("Goodbye!")
+                    break
 
-            handler = COMMANDS.get(cmd)
+                handler = COMMANDS.get(cmd)
 
-            if handler:
-                handler(service, args)
-            else:
-                print("Unknown command. Type 'notes help'")
+                if handler:
+                    handler(service, args)
+                else:
+                    print("Unknown command. Type 'notes help'")
 
-        except Exception as e:
-            print(f"Error: {e}")
+            except Exception as e:
+                print(f"Error: {e}")
 
-        print("--- \n")
+            print("--- \n")
+    finally:
+        service.close()
 
 if __name__ == "__main__":
     main()
